@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherHealth // Advanced Healthcare Analytics Dashboard</title>
+    <meta name="description" content="A futuristic glassmorphic Health Analytics Dashboard with Python Pandas backend integration and interactive clinical charts.">
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js CDN for interactive visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z"/>
+                </svg>
+                <span class="logo-text">AetherHealth</span>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item active" data-target="dashboard-view">
+                    <a href="#dashboard">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="9" rx="1"/>
+                            <rect x="14" y="3" width="7" height="5" rx="1"/>
+                            <rect x="14" y="12" width="7" height="9" rx="1"/>
+                            <rect x="3" y="16" width="7" height="5" rx="1"/>
+                        </svg>
+                        <span>Clinical Overview</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-target="patients-view">
+                    <a href="#patients">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        <span>Patient Registry</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-target="bmi-view">
+                    <a href="#bmi">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                        <span>BMI Diagnostic</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-target="before-after-view">
+                    <a href="#before-after">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                        <span>Treatment Efficacy</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-target="ai-insights-view">
+                    <a href="#ai-insights">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                        <span>AI Clinical Insights</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-target="powerbi-view">
+                    <a href="#powerbi">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 20V10M12 20V4M6 20v-6"/>
+                        </svg>
+                        <span>Power BI Embedded</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-profile">
+                <div class="profile-avatar">AP</div>
+                <div class="profile-info">
+                    <h4>Dr. A. Pierce</h4>
+                    <p>Chief Medical Director</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Header / Top Bar Controls -->
+            <header class="top-bar">
+                <div class="search-container">
+                    <input type="text" id="patient-search" class="search-input" placeholder="Search registry ID or patient name...">
+                    <svg class="search-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                </div>
+
+                <div class="filters-actions">
+                    <select id="disease-filter" class="filter-select">
+                        <option value="all">All Diagnoses</option>
+                        <option value="Cardiovascular">Cardiovascular</option>
+                        <option value="Diabetes">Diabetes</option>
+                        <option value="Respiratory">Respiratory</option>
+                        <option value="Oncology">Oncology</option>
+                        <option value="Neurological">Neurological</option>
+                        <option value="None">No Disease</option>
+                    </select>
+
+                    <select id="gender-filter" class="filter-select">
+                        <option value="all">All Genders</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Non-binary">Non-binary</option>
+                    </select>
+
+                    <select id="age-filter" class="filter-select">
+                        <option value="all">All Ages</option>
+                        <option value="18-30">18-30 yrs</option>
+                        <option value="31-45">31-45 yrs</option>
+                        <option value="46-60">46-60 yrs</option>
+                        <option value="61-75">61-75 yrs</option>
+                        <option value="75+">75+ yrs</option>
+                    </select>
+
+                    <button id="download-report-btn" class="btn-primary">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                        </svg>
+                        <span>Download Report</span>
+                    </button>
+
+                    <div class="backend-status">
+                        <span id="backend-indicator" class="status-dot"></span>
+                        <span id="backend-text">Offline Mode</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Key Performance Indicators (KPI Cards) -->
+            <section class="kpi-container">
+                <!-- Total Patients -->
+                <div class="kpi-card glass-panel cyan">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Active Database</span>
+                        <div class="kpi-icon-wrapper">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="kpi-total-patients">0</div>
+                    <div class="kpi-footer">
+                        <span class="kpi-trend up">▲ 4.8%</span>
+                        <span class="kpi-label">v.s. last month</span>
+                    </div>
+                </div>
+
+                <!-- Average BMI -->
+                <div class="kpi-card glass-panel purple">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Average BMI</span>
+                        <div class="kpi-icon-wrapper">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                                <line x1="7" y1="7" x2="7.01" y2="7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="kpi-avg-bmi">0.0</div>
+                    <div class="kpi-footer">
+                        <span class="kpi-trend down">▼ 0.2%</span>
+                        <span class="kpi-label">ideal weight trend</span>
+                    </div>
+                </div>
+
+                <!-- Critical Blood Pressure -->
+                <div class="kpi-card glass-panel pink">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Critical BP Alert</span>
+                        <div class="kpi-icon-wrapper">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="kpi-critical-bp">0%</div>
+                    <div class="kpi-footer">
+                        <span class="kpi-trend up" style="color: var(--pink-accent);">▲ 1.4%</span>
+                        <span class="kpi-label">systolic &gt; 140 mmHg</span>
+                    </div>
+                </div>
+
+                <!-- Sugar Alerts -->
+                <div class="kpi-card glass-panel orange">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Diabetes Alert</span>
+                        <div class="kpi-icon-wrapper">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="kpi-sugar-alert">0%</div>
+                    <div class="kpi-footer">
+                        <span class="kpi-trend down">▼ 0.8%</span>
+                        <span class="kpi-label">fasting sugar &gt; 126 mg/dL</span>
+                    </div>
+                </div>
+
+                <!-- AI Health Score -->
+                <div class="kpi-card glass-panel green">
+                    <div class="kpi-header">
+                        <span class="kpi-title">AI Health Index</span>
+                        <div class="kpi-icon-wrapper">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="kpi-health-score">0</div>
+                    <div class="kpi-footer">
+                        <span class="kpi-trend up">▲ 2.5%</span>
+                        <span class="kpi-label">cohort quality metric</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SUBVIEWS SECTION CONTAINER -->
+            <div class="views-wrapper">
+                
+                <!-- VIEW 1: CLINICAL OVERVIEW (DASHBOARD) -->
+                <div id="dashboard-view" class="patients-section section-active">
+                    <div class="dashboard-grid">
+                        <!-- Left Column (Visit Trends & BP Analysis) -->
+                        <div class="grid-column">
+                            <div class="dashboard-card glass-panel">
+                                <div class="card-title-bar">
+                                    <h3>
+                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                                        </svg>
+                                        Hospital Visit Trends Timeline
+                                    </h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="visitTrendsChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="dashboard-card glass-panel">
+                                <div class="card-title-bar">
+                                    <h3>
+                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="18" cy="18" r="3"/>
+                                            <circle cx="6" cy="6" r="3"/>
+                                            <line x1="18" y1="15" x2="6" y2="9"/>
+                                        </svg>
+                                        Blood Pressure Clinical Mapping (Systolic vs Diastolic)
+                                    </h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="bloodPressureChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column (Disease by Age & Gender Proportions) -->
+                        <div class="grid-column">
+                            <div class="dashboard-card glass-panel">
+                                <div class="card-title-bar">
+                                    <h3>
+                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+                                            <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+                                        </svg>
+                                        Patient Gender Demographics
+                                    </h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="genderChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-card glass-panel">
+                                <div class="card-title-bar">
+                                    <h3>
+                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                            <line x1="9" y1="3" x2="9" y2="21"/>
+                                            <line x1="15" y1="3" x2="15" y2="21"/>
+                                        </svg>
+                                        Disease Prevalence by Age Cohort
+                                    </h3>
+                                </div>
+                                <div class="chart-wrapper" style="min-height: 250px;">
+                                    <canvas id="diseaseAgeChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 2: PATIENT REGISTRY -->
+                <div id="patients-view" class="patients-section">
+                    <div class="dashboard-card glass-panel table-card">
+                        <div class="card-title-bar">
+                            <h3>
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/>
+                                    <path d="M9 10h6M12 7v6"/>
+                                </svg>
+                                Clinic Patient Database Registry
+                            </h3>
+                        </div>
+                        <div class="patient-table-wrapper">
+                            <table class="patient-table" id="patients-data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Patient ID</th>
+                                        <th>Name</th>
+                                        <th>Age / Gender</th>
+                                        <th>Primary Disease</th>
+                                        <th>Current Sugar</th>
+                                        <th>BP (mmHg)</th>
+                                        <th>Current BMI</th>
+                                        <th>AI Score</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="patient-table-body">
+                                    <!-- Populated via Javascript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 3: BMI DIAGNOSTIC -->
+                <div id="bmi-view" class="patients-section">
+                    <div class="dashboard-card glass-panel">
+                        <div class="card-title-bar">
+                            <h3>
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                Interactive Body Mass Index (BMI) Diagnostic Calculator
+                            </h3>
+                        </div>
+                        
+                        <div class="bmi-calculator-layout">
+                            <div class="bmi-inputs">
+                                <div class="input-group">
+                                    <label for="bmi-height-slider">Patient Height: <span id="lbl-height">170</span> cm</label>
+                                    <div class="slider-container">
+                                        <input type="range" id="bmi-height-slider" min="120" max="220" value="170">
+                                        <span class="slider-val" id="val-height">170 cm</span>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label for="bmi-weight-slider">Patient Weight: <span id="lbl-weight">70</span> kg</label>
+                                    <div class="slider-container">
+                                        <input type="range" id="bmi-weight-slider" min="30" max="180" value="70">
+                                        <span class="slider-val" id="val-weight">70 kg</span>
+                                    </div>
+                                </div>
+                                <div class="ai-bullets" style="margin-top: 15px;">
+                                    <div class="ai-bullet">
+                                        <span class="ai-bullet-dot"></span>
+                                        <span>Formula: Weight (kg) / Height (m)<sup>2</sup>. Healthy BMI is between 18.5 and 24.9.</span>
+                                    </div>
+                                    <div class="ai-bullet">
+                                        <span class="ai-bullet-dot"></span>
+                                        <span style="color: var(--text-secondary);">Higher BMI is closely correlated with high blood pressure (systolic &gt; 130) and insulin resistance.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bmi-results">
+                                <span class="compare-label">CALCULATED VALUE</span>
+                                <div class="bmi-score-big" id="bmi-value-display">24.2</div>
+                                <div class="bmi-category-text badge badge-green" id="bmi-category-display">Normal</div>
+                                
+                                <div class="bmi-bar-gauge">
+                                    <div class="bmi-bar-fill" id="bmi-bar-indicator" style="width: 50%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 4: TREATMENT EFFICACY (BEFORE/AFTER) -->
+                <div id="before-after-view" class="patients-section">
+                    <div class="dashboard-grid">
+                        <div class="grid-column">
+                            <div class="dashboard-card glass-panel">
+                                <div class="card-title-bar">
+                                    <h3>
+                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                        </svg>
+                                        Clinical cohort: Before/After Treatment Comparison
+                                    </h3>
+                                </div>
+                                <div class="before-after-grid">
+                                    <!-- Weight compare -->
+                                    <div class="compare-card">
+                                        <div class="compare-label">Average Patient Weight</div>
+                                        <div class="compare-values">
+                                            <div class="val-box before">
+                                                <span class="num" id="comp-w-before">81.7</span>
+                                                <span class="lbl">Baseline (kg)</span>
+                                            </div>
+                                            <div class="arrow-divider">
+                                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                                    <polyline points="12 5 19 12 12 19"/>
+                                                </svg>
+                                            </div>
+                                            <div class="val-box after">
+                                                <span class="num" id="comp-w-after">80.1</span>
+                                                <span class="lbl">Current (kg)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- BP compare -->
+                                    <div class="compare-card">
+                                        <div class="compare-label">Systolic BP</div>
+                                        <div class="compare-values">
+                                            <div class="val-box before">
+                                                <span class="num" id="comp-bp-before">136.2</span>
+                                                <span class="lbl">Baseline (mmHg)</span>
+                                            </div>
+                                            <div class="arrow-divider">
+                                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                                    <polyline points="12 5 19 12 12 19"/>
+                                                </svg>
+                                            </div>
+                                            <div class="val-box after">
+                                                <span class="num" id="comp-bp-after">129.4</span>
+                                                <span class="lbl">Current (mmHg)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Sugar compare -->
+                                    <div class="compare-card">
+                                        <div class="compare-label">Fasting Sugar Level</div>
+                                        <div class="compare-values">
+                                            <div class="val-box before">
+                                                <span class="num" id="comp-s-before">131.8</span>
+                                                <span class="lbl">Baseline (mg/dL)</span>
+                                            </div>
+                                            <div class="arrow-divider">
+                                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                                    <polyline points="12 5 19 12 12 19"/>
+                                                </svg>
+                                            </div>
+                                            <div class="val-box after">
+                                                <span class="num" id="comp-s-after">119.5</span>
+                                                <span class="lbl">Current (mg/dL)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="dashboard-card glass-panel">
+                                <div class="card-title-bar">
+                                    <h3>
+                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                            <polyline points="9 17 9 10 15 10 15 17"/>
+                                        </svg>
+                                        Treatment Efficacy Comparison Metrics Graph
+                                    </h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="beforeAfterComparisonChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid-column">
+                            <div class="dashboard-card glass-panel">
+                                <div class="card-title-bar">
+                                    <h3>
+                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                                            <polyline points="2 17 12 22 22 17"/>
+                                            <polyline points="2 12 12 17 22 12"/>
+                                        </svg>
+                                        Treatment Adherence Proportions
+                                    </h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="adherenceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 5: AI CLINICAL INSIGHTS -->
+                <div id="ai-insights-view" class="patients-section">
+                    <div class="dashboard-card glass-panel">
+                        <div class="card-title-bar">
+                            <h3>
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
+                                AI Engine Health Insight Terminal
+                            </h3>
+                        </div>
+                        <div class="ai-insights-panel">
+                            <div class="ai-header-tag">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                                </svg>
+                                CLINI-AI COGNITIVE AGENT RUNNING
+                            </div>
+                            <div class="ai-content" id="ai-insights-text">
+                                Select filters or patient registry profiles to run the AI engine clinical analysis summary.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 6: POWER BI EMBEDDED -->
+                <div id="powerbi-view" class="patients-section">
+                    <div class="dashboard-card glass-panel powerbi-view-card">
+                        <div class="card-title-bar">
+                            <h3>
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="2" y="2" width="20" height="20" rx="2" ry="2"/>
+                                    <line x1="3" y1="12" x2="21" y2="12"/>
+                                    <line x1="12" y1="3" x2="12" y2="21"/>
+                                </svg>
+                                Power BI Secure Embedding Framework
+                            </h3>
+                            <span class="powerbi-info-badge">DirectQuery Active</span>
+                        </div>
+                        <div class="powerbi-frame-container" id="powerbi-container">
+                            <!-- Populated by JavaScript with either a live direct iframe mock or embedding message -->
+                            <div class="powerbi-unconnected">
+                                <div class="powerbi-logo-big">
+                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="2" y="16" width="4" height="6" rx="1"/>
+                                        <rect x="10" y="10" width="4" height="12" rx="1"/>
+                                        <rect x="18" y="2" width="4" height="20" rx="1"/>
+                                    </svg>
+                                </div>
+                                <h4>Demonstration Power BI Cloud Report</h4>
+                                <p class="powerbi-desc">
+                                    Below is an interactive mock representation of the Power BI visualization dashboard, connected directly to our synthetic `patients.csv` dataset.
+                                </p>
+                                <button id="load-powerbi-btn" class="btn-primary" style="margin-top: 10px;">
+                                    Initialize Secure Embed Stream
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- PATIENT DETAILS DIALOG MODAL -->
+    <div class="detail-modal" id="patient-detail-modal">
+        <div class="modal-content glass-panel">
+            <button class="close-modal" id="close-modal-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <h2 id="modal-patient-name" style="font-family: var(--font-heading); margin-bottom: 10px;">Sarah Garcia</h2>
+            <div id="modal-patient-id" style="color: var(--cyan-primary); font-size: 0.95rem; margin-bottom: 20px; font-weight: 600;">PAT-1000</div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin-bottom: 20px;">
+            
+            <div class="modal-grid">
+                <div>
+                    <h4 style="color: var(--text-secondary); margin-bottom: 15px; font-family: var(--font-heading);">Physical & Clinical Telemetry</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.85rem;">
+                        <div>
+                            <span style="color: var(--text-muted);">Age / Gender:</span>
+                            <div id="modal-age-gender" style="font-weight: 600; margin-top: 3px;">34 / Female</div>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted);">Height:</span>
+                            <div id="modal-height" style="font-weight: 600; margin-top: 3px;">165 cm</div>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted);">Weight (Baseline / Current):</span>
+                            <div id="modal-weight" style="font-weight: 600; margin-top: 3px;">78.2 / 76.5 kg</div>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted);">Blood Pressure:</span>
+                            <div id="modal-bp" style="font-weight: 600; margin-top: 3px;">138 / 88 mmHg</div>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted);">Fasting Sugar:</span>
+                            <div id="modal-sugar" style="font-weight: 600; margin-top: 3px;">112 mg/dL</div>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted);">Primary Diagnosis:</span>
+                            <div id="modal-disease" style="font-weight: 600; margin-top: 3px;">Cardiovascular</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 25px; font-size: 0.85rem;">
+                        <span style="color: var(--text-muted);">Clinical Adherence & Duration:</span>
+                        <div style="margin-top: 5px; font-weight: 600;">
+                            Adherence: <span id="modal-adherence" class="badge badge-purple">High</span> 
+                            (Duration: <span id="modal-duration">12</span> Weeks)
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="modal-health-score-container">
+                        <span class="compare-label" style="margin-bottom: 12px;">CLINICAL HEALTH SCORE</span>
+                        <div class="modal-score-ring" id="modal-health-score">84</div>
+                    </div>
+                    
+                    <div class="ai-insights-panel" style="flex-grow: 1;">
+                        <div class="ai-header-tag" style="padding: 4px 10px; font-size: 0.7rem;">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                            CLINICAL DIAGNOSTIC NOTE
+                        </div>
+                        <div class="ai-content" id="modal-ai-note" style="min-height: 80px; padding: 12px; font-size: 0.8rem; background: rgba(0,0,0,0.4);">
+                            Loading AI diagnostics...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frontend Core Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>
