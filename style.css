@@ -788,7 +788,7 @@ body {
 
 /* Power BI Embedding Mock View */
 .powerbi-view-card {
-    min-height: 450px;
+    min-height: 560px;
     display: flex;
     flex-direction: column;
 }
@@ -798,6 +798,7 @@ body {
     border-radius: 12px;
     overflow: hidden;
     position: relative;
+    min-height: 480px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     background: rgba(0, 0, 0, 0.3);
 }
@@ -958,6 +959,84 @@ body {
     font-weight: 800;
     color: var(--cyan-primary);
     box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+    transition: all 0.4s ease;
+    animation: spinRing 1.5s ease-out;
+}
+
+@keyframes spinRing {
+    from { transform: rotate(-90deg); opacity: 0.3; }
+    to { transform: rotate(0deg); opacity: 1; }
+}
+/* --- FORM STYLES --- */
+.futuristic-form .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.futuristic-form .form-group {
+    display: flex;
+    flex-direction: column;
+}
+.futuristic-form label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    font-family: var(--font-heading);
+}
+.futuristic-form input,
+.futuristic-form select {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+.futuristic-form input:focus,
+.futuristic-form select:focus {
+    border-color: var(--cyan-primary);
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+}
+.futuristic-form select option {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+}
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+.action-buttons button {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+}
+.btn-view {
+    background: rgba(0, 242, 254, 0.15);
+    color: var(--cyan-primary);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+}
+.btn-view:hover {
+    background: var(--cyan-primary);
+    color: var(--bg-dark);
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+}
+.btn-edit {
+    background: rgba(255, 159, 67, 0.15);
+    color: var(--orange-warning);
+    border: 1px solid rgba(255, 159, 67, 0.3);
+}
+.btn-edit:hover {
+    background: var(--orange-warning);
+    color: var(--bg-dark);
+    box-shadow: 0 0 15px rgba(255, 159, 67, 0.4);
 }
 
 /* CSS print rules for PDF download styling */
